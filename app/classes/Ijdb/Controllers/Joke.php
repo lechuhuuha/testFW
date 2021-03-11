@@ -23,24 +23,12 @@ class Joke
     }
     public function list()
     {
-        $result = $this->jokesTable->findAll();
+        $jokes = $this->jokesTable->findAll();
         $totalJokes = $this->jokesTable->total();
-        $title = 'Joke list';
-        $jokes = [];
-        foreach ($result as $joke) {
-            $author =
-                $this->authorsTable->findById($joke['authorid']);
-            $email = $this->emailsTable->findById($author['id']);
-            $jokes[] = [
-                'id' => $joke['id'],
-                'joketext' => $joke['joketext'],
-                'jokedate' => $joke['jokedate'],
-                'name' => $author['name'],
-                'email' => $email['email'],
-                'authorId' => $author['id']
+        $author = $this->authentication->getUser();
 
-            ];
-        }
+        $title = 'Joke list';
+
 
         return [
             'template' => 'jokes.html.php',
@@ -48,7 +36,7 @@ class Joke
             'variables' => [
                 'totalJokes' => $totalJokes,
                 'jokes' => $jokes,
-                'userId' => $author['id'] ?? null
+                'userId' => $author->id ?? null
             ]
         ];
     }
@@ -67,7 +55,9 @@ class Joke
 
         if (isset($_POST['id'])) {
             $joke = $this->jokesTable->findById($_POST['id']);
-            if ($joke['authorid'] != $author['id']) {
+            // if ($joke['authorid'] != $author['id']) {
+            if ($joke->authorid != $author->id) {
+
                 return;
             }
         }
@@ -100,22 +90,24 @@ class Joke
     public function saveEdit()
     {
         $author = $this->authentication->getUser();
-        $authorObject = new \Ijdb\Entity\Author($this->jokesTable);
-        $authorObject->id = $author['id'];
-        $authorObject->name = $author['name'];
-        $authorObject->email = $author['email'];
-        $authorObject->password = $author['password'];
+        // $authorObject = new \Ijdb\Entity\Author($this->jokesTable);
+        // $authorObject->id = $author['id'];
+        // $authorObject->name = $author['name'];
+        // $authorObject->email = $author['email'];
+        // $authorObject->password = $author['password'];
 
         if (isset($_GET['id'])) {
             $joke = $this->jokesTable->findById($_GET['id']);
-            if ($joke['authorid'] != $author['id']) {
+            // if ($joke['authorid'] != $author['id']) {
+            if ($joke->authorid != $author->id) {
+
                 return;
             }
         }
         $joke = $_POST['joke'];
         $joke['jokedate'] = new \DateTime();
-        $authorObject->addJoke($joke);
-
+        // $authorObject->addJoke($joke);
+        $author->addJoke($joke);
         header('location: ' . URLROOT . 'joke/list');
     }
     public function edit()

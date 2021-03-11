@@ -11,8 +11,8 @@ class IjdbRoutes implements \Lchh\Routes
     public function __construct()
     {
         include __DIR__ . '/../../includes/DatabaseConnection.php';
-        $this->jokesTable = new \Lchh\DatabaseTable($pdo, 'joke', 'id');
-        $this->authorsTable = new \Lchh\DatabaseTable($pdo, 'author', 'id');
+        $this->jokesTable = new \Lchh\DatabaseTable($pdo, 'joke', 'id', '\Ijdb\Entity\Joke', [&$this->authorsTable]);
+        $this->authorsTable = new \Lchh\DatabaseTable($pdo, 'author', 'id', '\Ijdb\Entity\Author', [&$this->jokesTable, &$this->emailsTable]);
         $this->emailsTable = new \Lchh\DatabaseTable($pdo, 'email', 'id');
         $this->authentication = new \Lchh\Authentication($this->authorsTable, 'name', 'password');
     }
