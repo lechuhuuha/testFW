@@ -8,13 +8,19 @@ class IjdbRoutes implements \Lchh\Routes
     private $jokesTable;
     private $authentication;
     private $emailsTable;
+    private $categoriesTable;
+    private $jokeCategoriesTable;
+    private $authorEmailsTable;
     public function __construct()
     {
         include __DIR__ . '/../../includes/DatabaseConnection.php';
-        $this->jokesTable = new \Lchh\DatabaseTable($pdo, 'joke', 'id', '\Ijdb\Entity\Joke', [&$this->authorsTable]);
-        $this->authorsTable = new \Lchh\DatabaseTable($pdo, 'author', 'id', '\Ijdb\Entity\Author', [&$this->jokesTable, &$this->emailsTable]);
+        $this->jokesTable = new \Lchh\DatabaseTable($pdo, 'joke', 'id', '\Ijdb\Entity\Joke', [&$this->authorsTable, &$this->emailsTable, &$this->jokeCategoriesTable, &$this->authorEmailsTable]);
+        $this->authorsTable = new \Lchh\DatabaseTable($pdo, 'author', 'id', '\Ijdb\Entity\Author', [&$this->jokesTable, &$this->emailsTable, &$this->authorEmailsTable]);
         $this->emailsTable = new \Lchh\DatabaseTable($pdo, 'email', 'id');
         $this->authentication = new \Lchh\Authentication($this->authorsTable, 'name', 'password');
+        $this->jokeCategoriesTable = new \Lchh\DatabaseTable($pdo, 'jokecategory', 'categoryid');
+        $this->categoriesTable = new \Lchh\DatabaseTable($pdo, 'category', 'id', '\Ijdb\Entity\Category', [&$this->jokesTable, &$this->jokeCategoriesTable]);
+        $this->authorEmailsTable = new \Lchh\DatabaseTable($pdo, 'authoremail', 'authorid');
     }
     public function getRoutes(): array
     {
@@ -22,12 +28,14 @@ class IjdbRoutes implements \Lchh\Routes
             $this->jokesTable,
             $this->authorsTable,
             $this->emailsTable,
+            $this->categoriesTable,
             $this->authentication
         );
         $authorController = new \Ijdb\Controllers\Register(
             $this->authorsTable,
             $this->emailsTable
         );
+        $categoryController = new \Ijdb\Controllers\Category($this->categoriesTable);
         $loginController = new \Ijdb\Controllers\Login($this->authentication);
         $routes = [
             'joke/edit' => [
@@ -76,6 +84,36 @@ class IjdbRoutes implements \Lchh\Routes
                     'action' => 'success'
                 ]
             ],
+            'category/edit' => [
+                'POST' => [
+                    'controller' => $categoryController,
+                    'action' => 'saveEdit'
+                ],
+                'GET' => [
+                    'controller' => $categoryController,
+                    'action' => 'edit'
+                ],
+                'login' => true,
+                'permissions' => \Ijdb\Entity\Author::EDIT_CATEGORIES
+
+            ],
+            'category/list' => [
+                'GET' => [
+                    'controller' => $categoryController,
+                    'action' => 'list'
+                ],
+                'login' => true,
+                'permissions' => \Ijdb\Entity\Author::LIST_CATEGORIES
+
+            ],
+            'category/delete' => [
+                'POST' => [
+                    'controller' => $categoryController,
+                    'action' => 'delete'
+                ],
+                'login' => true,
+                'permissions' => \Ijdb\Entity\Author::DELETE_JOKE
+            ],
             'login/error' => [
                 'GET' => [
                     'controller' => $loginController,
@@ -104,6 +142,24 @@ class IjdbRoutes implements \Lchh\Routes
                     'controller' => $loginController,
                     'action' => 'logout'
                 ]
+            ],
+            'author/permissions' => [
+                'GET' => [
+                    'controller' => $authorController,
+                    'action' => 'permissions'
+                ],
+                'POST' => [
+                    'controller' => $authorController,
+                    'action' => 'savePermissions'
+                ],
+                'login' => true
+            ],
+            'author/list' => [
+                'GET' => [
+                    'controller' => $authorController,
+                    'action' => 'list'
+                ],
+                'login' => true
             ]
         ];
 
@@ -112,5 +168,14 @@ class IjdbRoutes implements \Lchh\Routes
     public function getAuthentication(): \Lchh\Authentication
     {
         return $this->authentication;
+    }
+    public function checkPermission($permission): bool
+    {
+        $user = $this->authentication->getUser();
+        if ($user && $user->hasPermission($permission)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

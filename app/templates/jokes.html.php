@@ -1,3 +1,10 @@
+<h2>CATEGORIES</h2>
+<ul>
+    <?php foreach ($categories as $category) : ?>
+        <li><a href="<?php echo URLROOT . 'joke/list?category=' . $category->id ?>"><?= $category->name ?></a></li>
+    <?php endforeach; ?>
+</ul>
+<h2>Joke</h2>
 <p><?= $variables['totalJokes'] ?> jokes have been submitted to the Internet Joke Database.</p>
 <?php foreach ($jokes as $joke) : ?>
     <blockquote>
@@ -8,7 +15,7 @@
                 'UTF-8'
             ) ?>
             (by <a href="mailto:<?= htmlspecialchars(
-                                    $joke->getEmail()->email,
+                                    $joke->getEmail()[0]->email,
                                     ENT_QUOTES,
                                     'UTF-8'
                                 ); ?>">
@@ -20,7 +27,7 @@
                                 $date = new DateTime($joke->jokedate);
                                 echo $date->format('jS F Y');
                                 ?>)
-            <?php if ($userId == $joke->authorId) : ?>
+            <?php if ($userId == $joke->authorid) : ?>
                 <a href="<?php echo URLROOT .  'joke/edit?id=' . $joke->id ?>">Edit
                 </a>
         <form action="<?php echo URLROOT ?>joke/delete" method="post">
@@ -32,4 +39,3 @@
     </p>
     </blockquote>
 <?php endforeach; ?>
-<?php print_r('lol') ?>

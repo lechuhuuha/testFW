@@ -50,7 +50,7 @@ class Register
             $valid = false;
             $errors[] = 'Name can not be blank';
         }
-        if(count($this->authorTable->find('name',$author['name']))>0){
+        if (count($this->authorTable->find('name', $author['name'])) > 0) {
             $valid = false;
             $errors[] = 'Username has already taken';
         }
@@ -77,5 +77,16 @@ class Register
                 ]
             ];
         }
+    }
+    public function list()
+    {
+        $authors = $this->authorTable->findAll();
+        return [
+            'template' => 'authorlist.html.php',
+            'title' => 'Author list',
+            'variables' => [
+                'authors' => $authors,
+            ]
+        ];
     }
 }

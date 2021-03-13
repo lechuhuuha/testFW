@@ -1,1 +1,6 @@
 SELECT `joketext`,category.name FROM `joke` INNER JOIN `jokecategory` ON joke.id = jokecategory.jokeid INNER JOIN `category` ON category.id = `jokecategory`.`categoryid`
+create relational table with author and email 
+ In author entity build function getEmail()
+ Loop through relational table with authorid 
+ Loop through the value from above to in to $email[]
+ return email[]

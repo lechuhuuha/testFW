@@ -10,22 +10,34 @@ class Joke
     private $authorsTable;
     private $jokesTable;
     private $emailsTable;
+    private $categoriesTable;
     public function __construct(
         DatabaseTable $jokesTable,
         DatabaseTable $authorsTable,
         DatabaseTable $emailsTable,
+        DatabaseTable $categoriesTable,
         Authentication $authentication
     ) {
         $this->jokesTable = $jokesTable;
         $this->authorsTable = $authorsTable;
         $this->emailsTable = $emailsTable;
+        $this->categoriesTable = $categoriesTable;
         $this->authentication = $authentication;
     }
     public function list()
     {
-        $jokes = $this->jokesTable->findAll();
-        $totalJokes = $this->jokesTable->total();
+        if (isset($_GET['category'])) {
+            $category = $this->categoriesTable->findById($_GET['category']);
+            $jokes = $category->getJokes();
+        } else {
+            $jokes = $this->jokesTable->findAll();
+        }
+
+
         $author = $this->authentication->getUser();
+
+        $totalJokes = $this->jokesTable->total();
+
 
         $title = 'Joke list';
 
@@ -36,7 +48,8 @@ class Joke
             'variables' => [
                 'totalJokes' => $totalJokes,
                 'jokes' => $jokes,
-                'userId' => $author->id ?? null
+                'userId' => $author->id ?? null,
+                'categories' => $this->categoriesTable->findAll() ?? null
             ]
         ];
     }
@@ -107,13 +120,17 @@ class Joke
         $joke = $_POST['joke'];
         $joke['jokedate'] = new \DateTime();
         // $authorObject->addJoke($joke);
-        $author->addJoke($joke);
+        $jokeEntity = $author->addJoke($joke);
+        $jokeEntity->clearCategories();
+        foreach ($_POST['category'] as $categoryid) {
+            $jokeEntity->addCategory($categoryid);
+        }
         header('location: ' . URLROOT . 'joke/list');
     }
     public function edit()
     {
         $author = $this->authentication->getUser();
-
+        $categories = $this->categoriesTable->findAll();
         $title = 'Add joke';
         if (isset($_GET['id'])) {
             $joke = $this->jokesTable->findById($_GET['id']);
@@ -124,7 +141,8 @@ class Joke
             'title' => $title,
             'variables' => [
                 'joke' => $joke ?? null,
-                'userId' => $author['id'] ?? null
+                'userId' => $author->id ?? null,
+                'categories' => $categories ?? null
 
             ]
         ];
