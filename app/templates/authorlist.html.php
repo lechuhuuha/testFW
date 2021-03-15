@@ -10,7 +10,7 @@
             <tr>
                 <td><?= $author->name; ?></td>
                 <td><?= $author->getEmail()[0]->email; ?></td>
-                <td> <a href="<?= $author->id; ?>">Edit permissions</a></td>
+                <td> <a href="<?php echo URLROOT . 'author/permissions?id=' . $author->id; ?>">Edit permissions</a></td>
             </tr>
         <?php endforeach; ?>
     </tbody>

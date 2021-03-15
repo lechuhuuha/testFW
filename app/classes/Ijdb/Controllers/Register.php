@@ -89,4 +89,28 @@ class Register
             ]
         ];
     }
+    public function permissions()
+    {
+
+        $author = $this->authorTable->findById($_GET['id']);
+        $reflected = new \ReflectionClass('\Ijdb\Entity\Author');
+        $constants = $reflected->getConstants();
+        return [
+            'template' => 'permissions.html.php',
+            'title' => 'User permissions',
+            'variables' => [
+                'author' => $author,
+                'permissions' => $constants
+            ]
+        ];
+    }
+    public function savePermissions()
+    {
+        $author = [
+            'id' => $_GET['id'],
+            'permissions' => array_sum($_POST['permissions'])
+        ];
+        $this->authorTable->save($author);
+        header('location:' . URLROOT . 'author/list');
+    }
 }

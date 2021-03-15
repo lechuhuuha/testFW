@@ -4,3 +4,9 @@ create relational table with author and email
  Loop through relational table with authorid 
  Loop through the value from above to in to $email[]
  return email[]
+
+USE BINARY TO STORE USER ACCESS
+ Get the value from POST and then caculate total number of the POST value and than translate into binary 
+ Ex : 1+2+4+32 = 39 -> BINARY : 100111
+ Then add to relational table userpermissions
+ When validate user access get that value from db then transfer into decimal

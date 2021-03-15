@@ -48,7 +48,8 @@ class Joke
             'variables' => [
                 'totalJokes' => $totalJokes,
                 'jokes' => $jokes,
-                'userId' => $author->id ?? null,
+                'user' => $author,
+                // 'userId' => $author->id ?? null,
                 'categories' => $this->categoriesTable->findAll() ?? null
             ]
         ];
@@ -69,8 +70,10 @@ class Joke
         if (isset($_POST['id'])) {
             $joke = $this->jokesTable->findById($_POST['id']);
             // if ($joke['authorid'] != $author['id']) {
-            if ($joke->authorid != $author->id) {
-
+            if (
+                $joke->authorid != $author->id
+                && !$author->hasPermission(\Ijdb\Entity\Author::DELETE_JOKE)
+            ) {
                 return;
             }
         }
