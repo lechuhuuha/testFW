@@ -33,12 +33,12 @@
                     </a>
                 <?php endif; ?>
                 <?php if ($user->id == $joke->authorid || $user->hasPermission(\Ijdb\Entity\Author::DELETE_JOKE)) : ?>
-                    <form action="<?php echo URLROOT ?>joke/delete" method="post">
-                        <input type="hidden" name="id" value="<?= $joke->id ?>">
-                        <input type="submit" value="Delete">
-                    </form>
-                <?php endif; ?>
-            <?php endif; ?>
+        <form action="<?php echo URLROOT ?>joke/delete" method="post">
+            <input type="hidden" name="id" value="<?= $joke->id ?>">
+            <input type="submit" value="Delete">
+        </form>
+    <?php endif; ?>
+<?php endif; ?>
 
 </p>
     </blockquote>

@@ -45,8 +45,12 @@ class EntryPoint
         ) {
             header('Location:' . URLROOT . 'login/error');
         }
-        $controller = $routes[$this->route][$this->method]['controller'];
-        $action = $routes[$this->route][$this->method]['action'];
+        if (isset($routes[$this->route][$this->method]['controller']) && isset($routes[$this->route][$this->method]['action'])) {
+            $controller = $routes[$this->route][$this->method]['controller'];
+            $action = $routes[$this->route][$this->method]['action'];
+        } else {
+            header('Location:' . URLROOT . 'login/error');
+        }
 
         $page =  $controller->$action();
 
