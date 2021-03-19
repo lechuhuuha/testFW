@@ -58,10 +58,13 @@ class Joke
     {
         $title = 'Internet Joke Database';
 
-        return ['template' => 'home.html.php', 'title' =>
-        $title, 'variables' => [
-            'joke' => $joke ?? null
-        ]];
+        return [
+            'template' => 'home.html.php',
+            'title' => $title,
+            'variables' => [
+                'joke' => $joke ?? null
+            ]
+        ];
     }
     public function delete()
     {
