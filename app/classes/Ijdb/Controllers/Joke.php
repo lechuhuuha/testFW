@@ -41,7 +41,7 @@ class Joke
 
         $title = 'Joke list';
 
-
+        
         return [
             'template' => 'jokes.html.php',
             'title' => $title,
